@@ -1,31 +1,32 @@
 # mc-mirror
 
-`mc-mirror` — это простой HTTP-прокси для зеркалирования Maven Central с локальным кэшированием артефактов. Он перехватывает GET и HEAD-запросы от Maven-клиента, кэширует загруженные файлы и отдает их напрямую при повторных обращениях.
+`mc-mirror` is a simple HTTP proxy for mirroring Maven Central with local artifact caching. It intercepts `GET` and `HEAD` requests from Maven clients, caches the downloaded files, and serves them directly on subsequent requests.
 
-## 🧩 Особенности
+## 🧩 Features
 
-- ✅ Поддержка `GET` и `HEAD` запросов
-- 🗂 Локальное кэширование артефактов в папке `./storage`
-- 🔌 Простая настройка порта запуска (`-port`)
-- ⚡ Работает как "ленивое" зеркало — загружает файлы по мере необходимости
+* ✅ Supports `GET` and `HEAD` requests
+* 🗂 Local artifact caching in the `./storage` directory
+* 🔌 Easy port configuration via `-port` flag
+* ⚡ Works as a "lazy" mirror — downloads files on demand
+* 🐳 **Planned: Docker Compose support for easier deployment**
 
-## 🚀 Установка и запуск
+## 🚀 Installation and Run
 
 ```bash
 git clone https://github.com/jf17/mc-mirror.git
 cd mc-mirror
 go run mc-mirror.go -port=8080
-````
+```
 
-### Аргументы командной строки
+### Command-Line Arguments
 
-| Параметр | Описание                            | Значение по умолчанию |
-| -------- | ----------------------------------- | --------------------- |
-| `-port`  | Порт, на котором запускается сервер | `8080`                |
+| Parameter | Description                   | Default Value |
+| --------- | ----------------------------- | ------------- |
+| `-port`   | Port on which the server runs | `8080`        |
 
-## 🔧 Настройка Maven
+## 🔧 Maven Configuration
 
-Чтобы использовать `mc-mirror` в качестве зеркала, добавьте следующий блок в файл `~/.m2/settings.xml`:
+To use `mc-mirror` as a mirror, add the following block to your `~/.m2/settings.xml` file:
 
 ```xml
 <settings>
@@ -39,22 +40,43 @@ go run mc-mirror.go -port=8080
 </settings>
 ```
 
-## 📁 Структура проекта
+## 🔧 Gradle Configuration
 
-```text
-mc-mirror/
-├── mc-mirror.go     # Исходный код прокси-сервера
-├── storage/         # Кэшированные артефакты (создаётся автоматически)
-└── README.md        # Этот файл
+To use `mc-mirror` with Gradle, modify your `repositories` block in `build.gradle` (Groovy DSL):
+
+```groovy
+repositories {
+    maven {
+        url "http://localhost:8080"
+    }
+}
 ```
 
-## 💡 Пример использования
+Or in `build.gradle.kts` (Kotlin DSL):
 
-После запуска сервера и настройки Maven вы можете выполнять команды вроде:
+```kotlin
+repositories {
+    maven {
+        url = uri("http://localhost:8080")
+    }
+}
+```
+
+> 💡 Note: If you're also using other repositories, make sure to list them after `mc-mirror`, since Gradle checks repositories in order.
+
+
+## 💡 Example Usage
+
+Once the server is running and your build tool is configured, you can run commands like:
 
 ```bash
 mvn dependency:resolve
 ```
 
-Первый раз зависимости будут скачаны из Maven Central и закешированы. При повторных запросах они будут отданы из локального хранилища `./storage`.
+or for Gradle:
 
+```bash
+./gradlew build
+```
+
+The first time, dependencies will be fetched from Maven Central and cached. On subsequent requests, they will be served from the local `./storage` directory.
