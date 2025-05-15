@@ -12,7 +12,7 @@
 ## 🚀 Установка и запуск
 
 ```bash
-git clone https://github.com/yourname/mc-mirror.git
+git clone https://github.com/jf17/mc-mirror.git
 cd mc-mirror
 go run mc-mirror.go -port=8080
 ````
